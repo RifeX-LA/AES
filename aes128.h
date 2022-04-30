@@ -4,6 +4,7 @@
 #include <string_view>
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 #include "aes_tables.h"
 
 namespace cipher {
@@ -18,7 +19,7 @@ class aes128 {
         std::array<byte_block, m_rounds + 1> m_key_schedule;
 
         static void m_sub_word(std::array<uint8_t, 4>& word);
-        static void m_rot_word(std::array<uint8_t, 4>& word, std::ptrdiff_t i);
+        static void m_rot_word(std::array<uint8_t, 4>& word, std::ptrdiff_t offset);
         static void m_byte_block_transpose(byte_block& block);
         void m_key_expansion(const std::string_view& key);
 

@@ -4,9 +4,9 @@ void cipher::aes128::m_sub_word(std::array<uint8_t, 4>& word) {
     std::ranges::transform(word, word.begin(), [](uint8_t byte) {return aes::sbox[byte];});
 }
 
-void cipher::aes128::m_rot_word(std::array<uint8_t, 4>& word, std::ptrdiff_t i) {
-    auto mid_iterator = (i >= 0) ? word.begin() : word.end();
-    std::ranges::rotate(word, mid_iterator + i);
+void cipher::aes128::m_rot_word(std::array<uint8_t, 4>& word, std::ptrdiff_t offset) {
+    auto mid_iterator = (offset >= 0) ? word.begin() : word.end();
+    std::ranges::rotate(word, mid_iterator + offset);
 }
 
 void cipher::aes128::m_byte_block_transpose(byte_block& block) {
@@ -41,9 +41,7 @@ void cipher::aes128::m_key_expansion(const std::string_view& key) {
 }
 
 void cipher::aes128::m_sub_bytes(byte_block& state) {
-    for (auto& row : state) {
-        m_sub_word(row);
-    }
+    std::ranges::for_each(state, m_sub_word);
 }
 
 void cipher::aes128::m_shift_rows(byte_block& state) {
@@ -109,5 +107,10 @@ void cipher::aes128::m_decrypt_block(byte_block& block) const {
 }
 
 cipher::aes128::aes128(const std::string_view& key) {
+    constexpr std::size_t required_key_len = 16;
+    if (key.size() != required_key_len) {
+        throw std::length_error("Error: invalid key length (must be " + std::to_string(required_key_len) + " bytes)\n");
+    }
+
     m_key_expansion(key);
 }
