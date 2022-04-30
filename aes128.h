@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
+#include "MD5.h"
 #include "aes_tables.h"
 
 namespace cipher {
@@ -21,7 +21,7 @@ class aes128 {
         static void m_sub_word(std::array<uint8_t, 4>& word);
         static void m_rot_word(std::array<uint8_t, 4>& word, std::ptrdiff_t offset);
         static void m_byte_block_transpose(byte_block& block);
-        void m_key_expansion(const std::string_view& key);
+        void m_key_expansion(const uint8_t* key);
 
         static void m_sub_bytes(byte_block& state);
         static void m_shift_rows(byte_block& state);
