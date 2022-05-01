@@ -97,8 +97,8 @@ void cipher::aes128::m_decrypt_block(byte_block& block) const {
     for (std::size_t i = m_rounds - 1; i > 0; --i) {
         m_inv_sub_bytes(block);
         m_inv_shift_rows(block);
-        m_inv_mix_columns(block);
         m_xor_blocks(block, m_key_schedule[i]);
+        m_inv_mix_columns(block);
     }
 
     m_inv_sub_bytes(block);
