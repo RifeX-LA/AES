@@ -50,13 +50,13 @@ void cipher::aes128::m_shift_rows(byte_block& state) {
     }
 }
 
-void cipher::aes128::m_mix_columns(cipher::aes128::byte_block &state) {
+void cipher::aes128::m_mix_columns(byte_block& state) {
     // Will be implemented by Maxim
 }
 
 void cipher::aes128::m_inv_sub_bytes(byte_block& state) {
-    for (auto& row : state) {
-        std::ranges::transform(row, row.begin(), [](uint8_t byte) {return aes::inv_sbox[byte];});
+    for (auto& word : state) {
+        std::ranges::transform(word, word.begin(), [](uint8_t byte) {return aes::inv_sbox[byte];});
     }
 }
 
@@ -66,7 +66,7 @@ void cipher::aes128::m_inv_shift_rows(byte_block& state) {
     }
 }
 
-void cipher::aes128::m_inv_mix_columns(cipher::aes128::byte_block &state) {
+void cipher::aes128::m_inv_mix_columns(byte_block& state) {
     // Will be implemented by Maxim
 }
 

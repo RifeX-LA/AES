@@ -1,9 +1,7 @@
 #pragma once
 
-#include <string>
 #include <algorithm>
 #include <functional>
-#include <stdexcept>
 #include "MD5.h"
 #include "aes_tables.h"
 
