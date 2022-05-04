@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <functional>
-#include <ctime>
+#include <random>
 #include "MD5.h"
 #include "aes_tables.h"
 
@@ -35,7 +35,7 @@ class aes128 {
         void m_encrypt_block(byte_block& block) const;
         void m_decrypt_block(byte_block& block) const;
 
-        byte_block generate_initialization_vector() const;
+        static byte_block generate_initialization_vector();
 
         std::vector<byte_block> get_blocks_array(const std::string_view& text, const int lines_num, const int columns_num, bool complete_last_block) const;
         std::string get_string(std::vector<byte_block>& byte_blocks_array, bool delete_last_block) const;

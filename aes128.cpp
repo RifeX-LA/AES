@@ -106,17 +106,16 @@ void cipher::aes128::m_decrypt_block(byte_block& block) const {
     m_xor_blocks(block, m_key_schedule[0]);
 }
 
-cipher::aes128::byte_block cipher::aes128::generate_initialization_vector() const
+cipher::aes128::byte_block cipher::aes128::generate_initialization_vector()
 {
     byte_block initialization_vector;
-    srand(time(NULL));
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            initialization_vector[i][j] = rand() % 256;
-        }
+    std::mt19937 generator(std::random_device{}());
+    std::uniform_int_distribution<int> random_symbol(0, 255);
+
+    for (auto& line : initialization_vector) {
+        std::ranges::generate(line.begin(), line.end(), [&random_symbol, &generator]() -> uint8_t {return random_symbol(generator); });
     }
+
     return initialization_vector;
 }
 
@@ -212,17 +211,16 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::decrypt_ecb(std::vector<
 
 std::vector<cipher::aes128::byte_block> cipher::aes128::encrypt_cbc(std::vector<byte_block>& blocks_array) const
 {
-    std::vector<byte_block> encrypted_blocks_array;
+    std::vector<byte_block> encrypted_blocks_array(blocks_array.size() + 1);
 
-    byte_block initialization_vector = generate_initialization_vector();
-    byte_block previous_block = initialization_vector;
-    encrypted_blocks_array.push_back(initialization_vector);
+    byte_block previous_block = generate_initialization_vector();
+    encrypted_blocks_array[0] = previous_block;
 
     for (int i = 0; i < blocks_array.size(); i++)
     {
         cipher::aes128::m_xor_blocks(previous_block, blocks_array[i]);
         cipher::aes128::m_encrypt_block(previous_block);
-        encrypted_blocks_array.push_back(previous_block);
+        encrypted_blocks_array[i + 1] = previous_block;
     }
 
     return encrypted_blocks_array;
@@ -230,14 +228,14 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::encrypt_cbc(std::vector<
 
 std::vector<cipher::aes128::byte_block> cipher::aes128::decrypt_cbc(std::vector<byte_block>& blocks_array) const
 {
-    std::vector<byte_block> decrypted_blocks_array;
+    std::vector<byte_block> decrypted_blocks_array(blocks_array.size() - 1);
 
     for (int i = 1; i < blocks_array.size(); i++)
     {
         byte_block current_block = blocks_array[i];
         cipher::aes128::m_decrypt_block(current_block);
         cipher::aes128::m_xor_blocks(current_block, blocks_array[i - 1]);
-        decrypted_blocks_array.push_back(current_block);
+        decrypted_blocks_array[i - 1] = current_block;
     }
 
     return decrypted_blocks_array;
@@ -270,18 +268,17 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::decrypt_cfb(std::vector<
 
 std::vector<cipher::aes128::byte_block> cipher::aes128::encrypt_ofb(std::vector<byte_block>& blocks_array) const
 {
-    std::vector<byte_block> encrypted_blocks_array;
+    std::vector<byte_block> encrypted_blocks_array(blocks_array.size() + 1);
 
-    byte_block initialization_vector = generate_initialization_vector();
-    byte_block previous_gamma = initialization_vector;
-    encrypted_blocks_array.push_back(initialization_vector);
+    byte_block previous_gamma = generate_initialization_vector();
+    encrypted_blocks_array[0] = previous_gamma;
 
     for (int i = 0; i < blocks_array.size(); i++)
     {
         cipher::aes128::m_encrypt_block(previous_gamma);
         byte_block current_gamma = previous_gamma;
         cipher::aes128::m_xor_blocks(current_gamma, blocks_array[i]);
-        encrypted_blocks_array.push_back(current_gamma);
+        encrypted_blocks_array[i + 1] = current_gamma;
     }
 
     return encrypted_blocks_array;
@@ -289,7 +286,7 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::encrypt_ofb(std::vector<
 
 std::vector<cipher::aes128::byte_block> cipher::aes128::decrypt_ofb(std::vector<byte_block>& blocks_array) const
 {
-    std::vector<byte_block> decrypted_blocks_array;
+    std::vector<byte_block> decrypted_blocks_array(blocks_array.size() - 1);
     byte_block previous_gamma = blocks_array[0];
 
     for (int i = 1; i < blocks_array.size(); i++)
@@ -297,7 +294,7 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::decrypt_ofb(std::vector<
         cipher::aes128::m_encrypt_block(previous_gamma);
         byte_block current_gamma = previous_gamma;
         cipher::aes128::m_xor_blocks(current_gamma, blocks_array[i]);
-        decrypted_blocks_array.push_back(current_gamma);
+        decrypted_blocks_array[i - 1] = current_gamma;
     }
 
     return decrypted_blocks_array;
