@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <ctime>
 #include "MD5.h"
 #include "aes_tables.h"
 
