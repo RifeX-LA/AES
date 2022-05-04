@@ -65,20 +65,24 @@ void cipher::aes128::m_shift_rows(byte_block& state) {
 	}
 }
 
-void cipher::aes128::m_mix_columns(byte_block& state) {
+void cipher::aes128::m_multiply_matrix_by_columns(byte_block& state, const byte_block& op_table) {
 	for (std::size_t i = 0; i < state.size(); ++i) {
 		uint8_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
 		for (std::size_t j = 0; j < state.size(); ++j) {
-			s0 ^= m_gmul(state[j][i], aes::mix_columns_op[0][j]);
-			s1 ^= m_gmul(state[j][i], aes::mix_columns_op[1][j]);
-			s2 ^= m_gmul(state[j][i], aes::mix_columns_op[2][j]);
-			s3 ^= m_gmul(state[j][i], aes::mix_columns_op[3][j]);
+			s0 ^= m_gmul(state[j][i], op_table[0][j]);
+			s1 ^= m_gmul(state[j][i], op_table[1][j]);
+			s2 ^= m_gmul(state[j][i], op_table[2][j]);
+			s3 ^= m_gmul(state[j][i], op_table[3][j]);
 		}
 		state[0][i] = s0;
 		state[1][i] = s1;
 		state[2][i] = s2;
 		state[3][i] = s3;
 	}
+}
+
+void cipher::aes128::m_mix_columns(byte_block& state) {
+	m_multiply_matrix_by_columns(state, aes::mix_columns_op);
 }
 
 void cipher::aes128::m_inv_sub_bytes(byte_block& state) {
@@ -94,19 +98,7 @@ void cipher::aes128::m_inv_shift_rows(byte_block& state) {
 }
 
 void cipher::aes128::m_inv_mix_columns(byte_block& state) {
-	for (std::size_t i = 0; i < state.size(); ++i) {
-		uint8_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
-		for (std::size_t j = 0; j < state.size(); ++j) {
-			s0 ^= m_gmul(state[j][i], aes::inv_mix_columns_op[0][j]);
-			s1 ^= m_gmul(state[j][i], aes::inv_mix_columns_op[1][j]);
-			s2 ^= m_gmul(state[j][i], aes::inv_mix_columns_op[2][j]);
-			s3 ^= m_gmul(state[j][i], aes::inv_mix_columns_op[3][j]);
-		}
-		state[0][i] = s0;
-		state[1][i] = s1;
-		state[2][i] = s2;
-		state[3][i] = s3;
-	}
+	m_multiply_matrix_by_columns(state, aes::inv_mix_columns_op);
 }
 
 void cipher::aes128::m_xor_blocks(byte_block& lhs, const byte_block& rhs) {
