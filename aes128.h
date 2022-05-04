@@ -18,6 +18,7 @@ class aes128 {
 
         static void m_sub_word(std::array<uint8_t, 4>& word);
         static void m_rot_word(std::array<uint8_t, 4>& word, std::ptrdiff_t offset);
+        static uint8_t m_gmul(uint8_t a, uint8_t b);
         static void m_byte_block_transpose(byte_block& block);
         void m_key_expansion(const uint8_t* key);
 
