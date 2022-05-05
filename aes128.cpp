@@ -50,8 +50,39 @@ void cipher::aes128::m_shift_rows(byte_block& state) {
     }
 }
 
+uint8_t cipher::aes128::m_gmul(uint8_t a, uint8_t b) {
+    uint8_t p = 0;
+    uint8_t hi_bit_set;
+    for (uint8_t i = 0; i < 8; i++) {
+        if ((b & 1) == 1)
+            p ^= a;
+        hi_bit_set = (a & 0x80);
+        a <<= 1;
+        if (hi_bit_set == 0x80)
+            a ^= 0x1b;
+        b >>= 1;
+    }
+    return p;
+}
+
+void cipher::aes128::m_multiply_matrix_by_columns(byte_block& state, const byte_block& op_table) {
+    for (std::size_t i = 0; i < state.size(); ++i) {
+        uint8_t s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+        for (std::size_t j = 0; j < state.size(); ++j) {
+            s0 ^= m_gmul(state[j][i], op_table[0][j]);
+            s1 ^= m_gmul(state[j][i], op_table[1][j]);
+            s2 ^= m_gmul(state[j][i], op_table[2][j]);
+            s3 ^= m_gmul(state[j][i], op_table[3][j]);
+        }
+        state[0][i] = s0;
+        state[1][i] = s1;
+        state[2][i] = s2;
+        state[3][i] = s3;
+    }
+}
+
 void cipher::aes128::m_mix_columns(byte_block& state) {
-    // Will be implemented by Maxim
+    m_multiply_matrix_by_columns(state, aes::mix_columns_op);
 }
 
 void cipher::aes128::m_inv_sub_bytes(byte_block& state) {
@@ -67,7 +98,7 @@ void cipher::aes128::m_inv_shift_rows(byte_block& state) {
 }
 
 void cipher::aes128::m_inv_mix_columns(byte_block& state) {
-    // Will be implemented by Maxim
+    m_multiply_matrix_by_columns(state, aes::inv_mix_columns_op);
 }
 
 void cipher::aes128::m_xor_blocks(byte_block& lhs, const byte_block& rhs) {
