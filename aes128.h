@@ -8,9 +8,9 @@
 
 namespace cipher {
 
-enum class mode {ecb, cbc, pcbc, cfb, ofb, ctr};
+    enum class mode { ecb, cbc, pcbc, cfb, ofb, ctr };
 
-class aes128 {
+    class aes128 {
     private:
         using byte_block = std::array<std::array<uint8_t, 4>, 4>;
 
@@ -37,8 +37,8 @@ class aes128 {
 
         static byte_block generate_initialization_vector();
 
-        std::vector<byte_block> get_blocks_array(const std::string_view& text, const int lines_num, const int columns_num, bool complete_last_block) const;
-        std::string get_string(std::vector<byte_block>& byte_blocks_array, bool delete_last_block) const;
+        static std::vector<byte_block> get_blocks_array(const std::string_view& text, bool complete_last_block);
+        static std::string get_string(std::vector<byte_block>& byte_blocks_array, bool delete_last_block);
 
         std::vector<byte_block> encrypt_ecb(std::vector<byte_block>& plain_text_blocks)const;
         std::vector<byte_block> decrypt_ecb(std::vector<byte_block>& cipher_text_block)const;
@@ -57,6 +57,6 @@ class aes128 {
 
         std::string encrypt(const std::string_view& plain_text, mode cipher_mode = mode::ecb) const;
         std::string decrypt(const std::string_view& cipher_text, mode cipher_mode = mode::ecb) const;
-};
+    };
 
 }
