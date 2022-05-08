@@ -1,6 +1,7 @@
 #ifndef BZF_MD5_H
 #define BZF_MD5_H
 
+#include <cstring>
 #include <string_view>
 
 class MD5 {

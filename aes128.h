@@ -2,13 +2,14 @@
 
 #include <algorithm>
 #include <functional>
+#include <execution>
 #include <random>
 #include "MD5.h"
 #include "aes_tables.h"
 
 namespace cipher {
 
-    enum class mode { ecb, cbc, pcbc, cfb, ofb, ctr };
+    enum class mode { ecb, cbc, cfb, ofb };
 
     class aes128 {
     private:
@@ -38,21 +39,20 @@ namespace cipher {
         void m_decrypt_block(byte_block& block) const;
 
         static byte_block generate_initialization_vector();
+        static std::vector<byte_block> m_to_byte_blocks(const std::string_view& text, bool complete_last_block);
+        static std::string m_to_text(const std::vector<byte_block>& byte_blocks, bool delete_last_block);
 
-        static std::vector<byte_block> get_blocks_array(const std::string_view& text, bool complete_last_block);
-        static std::string get_string(std::vector<byte_block>& byte_blocks_array, bool delete_last_block);
+        std::vector<byte_block> m_encrypt_ecb(const std::vector<byte_block>& plain_byte_blocks) const;
+        std::vector<byte_block> m_decrypt_ecb(const std::vector<byte_block>& cipher_byte_blocks) const;
 
-        std::vector<byte_block> encrypt_ecb(std::vector<byte_block>& plain_text_blocks)const;
-        std::vector<byte_block> decrypt_ecb(std::vector<byte_block>& cipher_text_block)const;
+        std::vector<byte_block> m_encrypt_cbc(const std::vector<byte_block>& plain_byte_blocks) const;
+        std::vector<byte_block> m_decrypt_cbc(const std::vector<byte_block>& cipher_byte_blocks) const;
 
-        std::vector<byte_block> encrypt_cbc(std::vector<byte_block>& blocks) const;
-        std::vector<byte_block> decrypt_cbc(std::vector<byte_block>& blocks) const;
+        std::vector<byte_block> m_encrypt_cfb(const std::vector<byte_block>& plain_byte_blocks) const;
+        std::vector<byte_block> m_decrypt_cfb(const std::vector<byte_block>& cipher_byte_blocks) const;
 
-        std::vector<byte_block> encrypt_cfb(std::vector<byte_block>& plain_text_blocks) const;
-        std::vector<byte_block> decrypt_cfb(std::vector<byte_block>& cipher_text_blocks)const;
-
-        std::vector<byte_block> encrypt_ofb(std::vector<byte_block>& blocks) const;
-        std::vector<byte_block> decrypt_ofb(std::vector<byte_block>& blocks) const;
+        std::vector<byte_block> m_encrypt_ofb(const std::vector<byte_block>& plain_byte_blocks) const;
+        std::vector<byte_block> m_decrypt_ofb(const std::vector<byte_block>& cipher_byte_blocks) const;
 
     public:
         explicit aes128(const std::string_view& key);
