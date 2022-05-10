@@ -309,7 +309,14 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::m_decrypt_ofb(const std:
 }
 
 cipher::aes128::aes128(const std::string_view& key) {
-    m_key_expansion(MD5(key).decimal_digest());
+    if (key.size() == 16) {
+        uint8_t key_uint8_t[16];
+        std::memcpy(key_uint8_t, key.data(), key.size());
+        m_key_expansion(key_uint8_t);
+    }
+    else {
+        m_key_expansion(MD5(key).decimal_digest());
+    }
 }
 
 std::string cipher::aes128::encrypt(const std::string_view& plain_text, cipher::mode cipher_mode) const {
