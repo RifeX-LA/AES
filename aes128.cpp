@@ -311,7 +311,7 @@ std::vector<cipher::aes128::byte_block> cipher::aes128::m_decrypt_ofb(const std:
 cipher::aes128::aes128(const std::string_view& key) {
     if (key.size() == 16) {
         uint8_t key_uint8_t[16];
-        std::memcpy(key_uint8_t, key.data(), key.size());
+        std::ranges::copy(key.begin(), key.end(), key_uint8_t);
         m_key_expansion(key_uint8_t);
     }
     else {
