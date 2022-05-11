@@ -319,8 +319,8 @@ cipher::aes128::aes128(const std::string_view& key) {
     }
 }
 
-std::string cipher::aes128::encrypt(const std::string_view& plain_text, cipher::mode cipher_mode) const {
-    std::vector<byte_block> plain_byte_blocks = m_to_byte_blocks(plain_text, true);
+std::string cipher::aes128::encrypt(const std::string_view& plain_text, cipher::mode cipher_mode, bool complete_last_block) const {
+    std::vector<byte_block> plain_byte_blocks = m_to_byte_blocks(plain_text, complete_last_block);
     std::vector<byte_block> cipher_byte_blocks;
 
     switch (cipher_mode) {
