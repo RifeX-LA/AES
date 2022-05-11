@@ -1,5 +1,7 @@
 #include <cmath>
 #include <bitset>
+#include <ranges>
+#include <iostream>
 #include <algorithm>
 #include "tests.h";
 
@@ -27,17 +29,14 @@ bool monobitTest(const std::string &str) {
 bool runsTest(const std::string &str) {
 	auto seq = toBitVector(str);
 	int n = seq.size();
-	double pi = 0, tau = 2 / sqrt(n);
-	for (bool bit : seq) {
-		pi += bit ? 1 : 0;
-	}
-	pi /= n;
+	double tau = 2 / sqrt(n);
+	double pi = static_cast<double>(std::ranges::count(seq, 1)) / n;
 	if (std::abs(pi - 0.5) >= tau) {
 		return false;
 	}
 	int V = 1;
 	for (std::size_t i = 0; i < n - 1; ++i) {
-		V += seq[i] == seq[i + 1] ? 0 : 1;
+		V += seq[i] != seq[i + 1];
 	}
 	return erfc(std::abs(V - 2 * pi * n * (1 - pi)) / (2 * sqrt(2 * n) * pi * (1 - pi))) >= 0.01;
 }
