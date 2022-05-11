@@ -58,7 +58,7 @@ namespace cipher {
         explicit aes128(const std::string_view& key);
 
         std::string encrypt(const std::string_view& plain_text, mode cipher_mode = mode::ecb, bool complete_last_block = true) const;
-        std::string decrypt(const std::string_view& cipher_text, mode cipher_mode = mode::ecb) const;
+        std::string decrypt(const std::string_view& cipher_text, mode cipher_mode = mode::ecb, bool delete_last_block = true) const;
     };
 
 }

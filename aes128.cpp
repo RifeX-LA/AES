@@ -341,7 +341,7 @@ std::string cipher::aes128::encrypt(const std::string_view& plain_text, cipher::
     return m_to_text(cipher_byte_blocks, false);
 }
 
-std::string cipher::aes128::decrypt(const std::string_view& cipher_text, cipher::mode cipher_mode) const {
+std::string cipher::aes128::decrypt(const std::string_view& cipher_text, cipher::mode cipher_mode, bool delete_last_block) const {
     std::vector<byte_block> cipher_byte_blocks = m_to_byte_blocks(cipher_text, false);
     std::vector<byte_block> plain_byte_blocks;
 
@@ -360,5 +360,5 @@ std::string cipher::aes128::decrypt(const std::string_view& cipher_text, cipher:
             break;
     }
 
-    return m_to_text(plain_byte_blocks, true);
+    return m_to_text(plain_byte_blocks, delete_last_block);
 }
