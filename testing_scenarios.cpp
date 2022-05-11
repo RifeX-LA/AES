@@ -39,12 +39,12 @@ std::string generate_heavy_or_little_weight_string_block(int start_elem) {
 }
 
 std::string low_weight_plaintext_random_key() {
-    int N = 65536;
+    int blocks_of_plain_text_num = 65536;
     std::string key = random_string(16);
     std::string ciphertext;
     ciphertext.reserve(1048576);
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < blocks_of_plain_text_num; i++) {
         std::string string_block = generate_heavy_or_little_weight_string_block(0);
         cipher::aes128 aes = cipher::aes128::aes128(key);
         ciphertext += aes.encrypt(string_block, cipher::mode::ecb, false);
@@ -53,12 +53,12 @@ std::string low_weight_plaintext_random_key() {
 }
 
 std::string heavy_weight_plaintext_random_key() {
-    int N = 65536;
+    int blocks_of_plain_text_num = 65536;
     std::string key = random_string(16);
     std::string ciphertext;
     ciphertext.reserve(1048576);
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < blocks_of_plain_text_num; i++) {
         std::string string_block = generate_heavy_or_little_weight_string_block(1);
         cipher::aes128 aes = cipher::aes128::aes128(key);
         ciphertext += aes.encrypt(string_block, cipher::mode::ecb, false);
@@ -67,12 +67,12 @@ std::string heavy_weight_plaintext_random_key() {
 }
 
 std::string random_plaintext_low_weight_key() {
-    int N = 65536;
+    int blocks_of_plain_text_num = 65536;
     std::string key = generate_heavy_or_little_weight_string_block(0);
     std::string ciphertext;
     ciphertext.reserve(1048576);
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < blocks_of_plain_text_num; i++) {
         std::string string_block = random_string(16);
         cipher::aes128 aes = cipher::aes128::aes128(key);
         ciphertext += aes.encrypt(string_block, cipher::mode::ecb, false);
