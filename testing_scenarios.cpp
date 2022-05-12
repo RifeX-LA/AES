@@ -130,19 +130,17 @@ std::string plain_text_errors_random_key() {
 
 std::string plain_text_and_chipertext_correlation() {
     std::string plain_text = random_string(bytes_in_megabyte);
-    std::string ciphertext = cipher::aes128(random_string(16)).encrypt(plain_text).substr(0, bytes_in_megabyte);
+    std::string ciphertext = cipher::aes128(random_string(16)).encrypt(plain_text, cipher::mode::ecb, false);
     return xor_strings(plain_text, ciphertext);
 }
 
 std::string block_chain_processing() {
     std::string result_str;
     result_str.reserve(bytes_in_megabyte);
-    std::string plain_text(16, 0);
+    std::string ciphertext(16, 0);
     std::string key = random_string(16);
-    std::string ciphertext = cipher::aes128(key).encrypt(plain_text).substr(0, 16);
-    result_str += ciphertext;
     for (std::size_t i = 0; i < bytes_in_megabyte / 16; ++i) {
-        ciphertext = cipher::aes128(key).encrypt(ciphertext).substr(0, 16);
+        ciphertext = cipher::aes128(key).encrypt(ciphertext, cipher::mode::ecb, false);
         result_str += ciphertext;
     }
     return result_str;
