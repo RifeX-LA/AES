@@ -44,7 +44,7 @@ bool runsTest(const std::string &str) {
 bool randomExcursionsVariantTest(const std::string& str) {
 	auto seq = toBitVector(str);
 	int n = str.size();
-	int j = 1;
+	long long j = 1;
 	std::vector<int> s(n + 2, 0);
 	std::vector<int> xi(2 * (n - 1), 0);
 	s[1] = seq[0] ? 1 : -1;
@@ -55,7 +55,7 @@ bool randomExcursionsVariantTest(const std::string& str) {
 		++xi[s[i] + (n - 1)];
 	}
 	for (int i = 0; i < xi.size(); ++i) {
-		int x = i < n - 1 ? i - n + 1 : i - n + 2;
+		long long x = i < n - 1 ? i - n + 1 : i - n + 2;
 		double P = erfc(std::abs(xi[i] - j) / sqrt(2 * j * (4 * std::abs(x) - 2)));
 		if (P < 0.01) {
 			return false;
