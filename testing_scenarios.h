@@ -2,6 +2,8 @@
 
 #include "aes128.h"
 
+constexpr std::size_t bytes_in_megabyte = 1'048'576;
+
 std::string xor_strings(const std::string_view& lhs, const std::string_view& rhs);
 std::string random_string(std::size_t size);
 
@@ -14,3 +16,7 @@ std::string low_weight_plaintext_random_key();
 std::string heavy_weight_plaintext_random_key();
 std::string random_plaintext_low_weight_key();
 std::string random_plaintext_heavy_weight_key();
+
+std::string random_plain_text_and_key();
+std::string random_plain_text_key_errors();
+std::string plain_text_errors_random_key();
