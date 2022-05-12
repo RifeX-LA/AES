@@ -19,7 +19,6 @@ std::string random_string(std::size_t size) {
 
 std::string generate_heavy_or_little_weight_string_block(int start_elem) {
     std::mt19937 gen(std::random_device{}());
-    std::uniform_int_distribution<int> random_symbol_from_minus128_to_127(-128, 127);
 
     std::string string_block(16, (256 - start_elem) % 256);
 
@@ -28,6 +27,7 @@ std::string generate_heavy_or_little_weight_string_block(int start_elem) {
 
     std::uniform_int_distribution<int> random_symbol_from_0_to_3(0, 3);
     std::uniform_int_distribution<int> random_bit_from_0_to_7(0, 7);
+
     for (int k = 0; k < weight; k++) {
         int i = random_symbol_from_0_to_3(gen);
         int j = random_symbol_from_0_to_3(gen);
@@ -35,34 +35,37 @@ std::string generate_heavy_or_little_weight_string_block(int start_elem) {
         char pow_of_two = pow(2, position_of_bit_to_change);
         string_block[i * 4 + j] ^= pow_of_two;
     }
+
     return string_block;
 }
 
 std::string low_or_heavy_weight_plaintext_random_key(int start_elem) {
-    int blocks_of_plain_text_num = 65536;
-    std::string key = random_string(16);
+    constexpr std::size_t blocks_of_plain_text_num = 65'536;
+
+    cipher::aes128 aes(random_string(16));
     std::string ciphertext;
     ciphertext.reserve(bytes_in_megabyte);
 
-    for (int i = 0; i < blocks_of_plain_text_num; i++) {
+    for (std::size_t i = 0; i < blocks_of_plain_text_num; ++i) {
         std::string string_block = generate_heavy_or_little_weight_string_block(start_elem);
-        cipher::aes128 aes(key);
         ciphertext += aes.encrypt(string_block, cipher::mode::ecb, false);
     }
+
     return ciphertext;
 }
 
 std::string random_plaintext_low_or_heavy_weight_key(int start_elem) {
-    int blocks_of_plain_text_num = 65536;
-    std::string key = generate_heavy_or_little_weight_string_block(start_elem);
+    constexpr std::size_t blocks_of_plain_text_num = 65'536;
+
+    cipher::aes128 aes(generate_heavy_or_little_weight_string_block(start_elem));
     std::string ciphertext;
     ciphertext.reserve(bytes_in_megabyte);
 
-    for (int i = 0; i < blocks_of_plain_text_num; i++) {
+    for (std::size_t i = 0; i < blocks_of_plain_text_num; ++i) {
         std::string string_block = random_string(16);
-        cipher::aes128 aes(key);
         ciphertext += aes.encrypt(string_block, cipher::mode::ecb, false);
     }
+
     return ciphertext;
 }
 
@@ -84,7 +87,7 @@ std::string random_plaintext_heavy_weight_key() {
 
 std::string random_plain_text_and_key() {
     cipher::aes128 aes(random_string(16));
-    return aes.encrypt(random_string(bytes_in_megabyte)).substr(0, bytes_in_megabyte);
+    return aes.encrypt(random_string(bytes_in_megabyte), cipher::mode::ecb, false);
 }
 
 std::string random_plain_text_key_errors() {
@@ -97,10 +100,9 @@ std::string random_plain_text_key_errors() {
 
     for (std::size_t i = 0; i < key_len; ++i) {
         std::string key = random_string(key_len);
-
-        std::string encrypted = cipher::aes128(key).encrypt(text).substr(0, plain_text_size);
+        std::string encrypted = cipher::aes128(key).encrypt(text, cipher::mode::ecb, false);
         key[i] ^= 1;
-        std::string encrypted_error_key = cipher::aes128(key).encrypt(text).substr(0, plain_text_size);
+        std::string encrypted_error_key = cipher::aes128(key).encrypt(text, cipher::mode::ecb, false);
 
         result_str += xor_strings(encrypted, encrypted_error_key);
     }
@@ -117,10 +119,9 @@ std::string plain_text_errors_random_key() {
 
     for (std::size_t i = 0; i < plain_text_size; ++i) {
         std::string plain_text = random_string(plain_text_size);
-
-        std::string encrypted = aes.encrypt(plain_text).substr(0, plain_text_size);
+        std::string encrypted = aes.encrypt(plain_text, cipher::mode::ecb, false);
         plain_text[i] ^= 1;
-        std::string encrypted_error_plain_text = aes.encrypt(plain_text).substr(0, plain_text_size);
+        std::string encrypted_error_plain_text = aes.encrypt(plain_text, cipher::mode::ecb, false);
 
         result_str += xor_strings(encrypted, encrypted_error_plain_text);
     }
@@ -131,17 +132,20 @@ std::string plain_text_errors_random_key() {
 std::string plain_text_and_chipertext_correlation() {
     std::string plain_text = random_string(bytes_in_megabyte);
     std::string ciphertext = cipher::aes128(random_string(16)).encrypt(plain_text, cipher::mode::ecb, false);
+
     return xor_strings(plain_text, ciphertext);
 }
 
 std::string block_chain_processing() {
+    cipher::aes128 aes(random_string(16));
+    std::string ciphertext(16, 0);
     std::string result_str;
     result_str.reserve(bytes_in_megabyte);
-    std::string ciphertext(16, 0);
-    std::string key = random_string(16);
+
     for (std::size_t i = 0; i < bytes_in_megabyte / 16; ++i) {
-        ciphertext = cipher::aes128(key).encrypt(ciphertext, cipher::mode::ecb, false);
+        ciphertext = aes.encrypt(ciphertext, cipher::mode::ecb, false);
         result_str += ciphertext;
     }
+
     return result_str;
 }

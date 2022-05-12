@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 
-std::vector<bool> toBitVector(const std::string& sequence);
-bool monobitTest(const std::string& sequence);
-bool runsTest(const std::string& sequence);
-bool randomExcursionsVariantTest(const std::string& sequence);
+std::vector<bool> to_bit_vector(const std::string& sequence);
+bool monobit_test(const std::string& sequence);
+bool runs_test(const std::string& sequence);
+bool random_excursions_variant_test(const std::string& sequence);
