@@ -20,3 +20,6 @@ std::string random_plaintext_heavy_weight_key();
 std::string random_plain_text_and_key();
 std::string random_plain_text_key_errors();
 std::string plain_text_errors_random_key();
+
+std::string plain_text_and_chipertext_correlation();
+std::string block_chain_processing();
